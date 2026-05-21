@@ -1,0 +1,39 @@
+# Enterprise AI Chatbot — Backend Dependencies
+#
+# Install all packages:
+#   Windows:  ..\RAG_VENV\Scripts\pip install -r requirements.txt
+#   Mac/Linux: ../RAG_VENV/bin/pip install -r requirements.txt
+#
+# bcrypt is pinned to 4.0.1 — passlib is incompatible with bcrypt 5.x API.
+
+# ── Web framework ─────────────────────────────────────────────────────────────
+fastapi
+uvicorn[standard]
+
+# ── Database ──────────────────────────────────────────────────────────────────
+sqlalchemy
+
+# ── Authentication ────────────────────────────────────────────────────────────
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt==4.0.1
+
+# ── Request handling ──────────────────────────────────────────────────────────
+python-multipart
+python-dotenv
+pydantic-settings
+pydantic[email]
+
+# ── Embeddings + Vector search ────────────────────────────────────────────────
+sentence-transformers
+faiss-cpu
+numpy
+
+# ── Document parsers ──────────────────────────────────────────────────────────
+pdfplumber
+python-docx
+beautifulsoup4
+requests
+
+# ── Rate limiting ─────────────────────────────────────────────────────────────
+slowapi

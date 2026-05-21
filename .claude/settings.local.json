@@ -1,0 +1,49 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Path \"e:\\\\Claude_Work\\\\PythonCode\" -Recurse | Select-Object FullName, @{Name=\"Size\";Expression={$_.Length}} | Format-Table -AutoSize)",
+      "Bash(RAG_VENV/Scripts/pip install *)",
+      "Bash(../RAG_VENV/Scripts/python -c ' *)",
+      "Bash(\"../RAG_VENV/Scripts/python\" -m uvicorn main:app --host 0.0.0.0 --port 8000)",
+      "Bash(Start-Sleep -Seconds 3)",
+      "Bash(Invoke-WebRequest -Uri \"http://localhost:8000/health\" -UseBasicParsing)",
+      "Bash(Select-Object -ExpandProperty Content)",
+      "Bash(curl -s http://localhost:8000/health)",
+      "Bash(\"../RAG_VENV/Scripts/python\" -W error -c \"import main\")",
+      "Bash(curl -s http://localhost:11434/api/tags)",
+      "Bash(curl -s -X POST http://localhost:11434/api/embeddings -H \"Content-Type: application/json\" -d '{\"model\":\"gpt-oss:120b-cloud\",\"prompt\":\"test\"}')",
+      "Bash(curl -s -X POST http://localhost:11434/api/embed -H \"Content-Type: application/json\" -d '{\"model\":\"gpt-oss:120b-cloud\",\"input\":\"test sentence for embedding\"}')",
+      "Bash(curl -s http://localhost:11434/api/version)",
+      "Bash(ollama list *)",
+      "Bash(\"../RAG_VENV/Scripts/python\" test_ingestion.py)",
+      "Bash(curl -s -X POST http://localhost:11434/api/chat -H \"Content-Type: application/json\" -d \"{\\\\\"model\\\\\":\\\\\"gpt-oss:120b-cloud\\\\\",\\\\\"messages\\\\\":[{\\\\\"role\\\\\":\\\\\"user\\\\\",\\\\\"content\\\\\":\\\\\"Say hello in one word\\\\\"}],\\\\\"stream\\\\\":false}\")",
+      "Bash(curl -s -X POST http://localhost:11434/api/chat -H \"Content-Type: application/json\" -d \"{\\\\\"model\\\\\":\\\\\"gpt-oss:120b-cloud\\\\\",\\\\\"messages\\\\\":[{\\\\\"role\\\\\":\\\\\"user\\\\\",\\\\\"content\\\\\":\\\\\"Reply with valid JSON only: {\\\\\\\\\\\\\"answer\\\\\\\\\\\\\": \\\\\\\\\\\\\"test\\\\\\\\\\\\\"}\\\\\"}],\\\\\"stream\\\\\":false,\\\\\"format\\\\\":\\\\\"json\\\\\"}\")",
+      "Bash(\"../RAG_VENV/Scripts/python\" test_query_engine.py)",
+      "Bash(cat \"/c/Users/sumit/AppData/Local/Temp/claude/e--Claude-Work-PythonCode/d0183d68-897d-4fc6-b001-2825a7e3e168/tasks/b5xj1zqp6.output\" 2>&1 | tail -40)",
+      "Read(//c/Users/sumit/AppData/Local/Temp/claude/e--Claude-Work-PythonCode/d0183d68-897d-4fc6-b001-2825a7e3e168/tasks/**)",
+      "Bash(\"../RAG_VENV/Scripts/python\" test_router_agent.py)",
+      "Bash(..\\\\RAG_VENV\\\\Scripts\\\\python test_router_agent.py)",
+      "PowerShell(Start-Process \"e:\\\\Claude_Work\\\\PythonCode\\\\docs\\\\ui_prototype.html\")",
+      "PowerShell(node --version)",
+      "PowerShell(npm --version 2>&1)",
+      "PowerShell(New-Item -ItemType Directory -Force \"e:\\\\Claude_Work\\\\PythonCode\\\\mobile\\\\services\")",
+      "PowerShell(New-Item -ItemType Directory -Force \"e:\\\\Claude_Work\\\\PythonCode\\\\mobile\\\\context\")",
+      "PowerShell(New-Item -ItemType Directory -Force \"e:\\\\Claude_Work\\\\PythonCode\\\\mobile\\\\screens\")",
+      "PowerShell(New-Item -ItemType Directory -Force \"e:\\\\Claude_Work\\\\PythonCode\\\\mobile\\\\components\")",
+      "Bash(npx tsc *)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\({k:v for k,v in {**d.get\\('dependencies',{}\\),**d.get\\('devDependencies',{}\\)}.items\\(\\) if 'document' in k.lower\\(\\) or 'tab' in k.lower\\(\\) or 'bottom' in k.lower\\(\\)}, indent=2\\)\\)\")",
+      "Bash(..\\\\RAG_VENV\\\\Scripts\\\\pip show *)",
+      "Bash(npx expo *)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('name:', d.get\\('name'\\)\\); print\\('version:', d.get\\('version'\\)\\); deps=d.get\\('dependencies',{}\\); [print\\(k,v\\) for k,v in deps.items\\(\\)]\")",
+      "Bash(npm install *)",
+      "Bash(ipconfig)",
+      "PowerShell(Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.IPAddress -notmatch '^\\(127|169\\)' } | Select-Object InterfaceAlias, IPAddress)",
+      "PowerShell(if \\(!\\(Test-Path \"C:\\\\Users\\\\sumit\\\\.claude\\\\skills\"\\)\\) { New-Item -ItemType Directory -Force \"C:\\\\Users\\\\sumit\\\\.claude\\\\skills\" } else { Write-Output \"exists\" })",
+      "PowerShell(Get-ChildItem -Path \"e:\\\\Claude_Work\\\\PythonCode\" -Depth 2 | Where-Object { !$_.PSIsContainer } | Select-Object FullName | Format-Table -AutoSize)",
+      "PowerShell(New-Item -ItemType Directory -Force \"e:\\\\Claude_Work\\\\PythonCode\\\\docs\\\\screenshots\")"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\sumit\\.claude\\skills"
+    ]
+  }
+}

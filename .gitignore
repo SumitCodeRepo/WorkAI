@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+RAG_VENV/
+
+# Database
+backend/chatbot.db
+
+# FAISS indexes (rebuilt from documents)
+backend/vector_store/
+
+# Temp / test output
+temp/*.log
+temp/*.log.*
+
+# Environment secrets
+backend/.env
+
+# OS
+.DS_Store
+Thumbs.db

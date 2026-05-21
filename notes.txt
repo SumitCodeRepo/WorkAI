@@ -1,0 +1,3 @@
+Command to setup PYTHON ENVOIRMENT
+
+python --versionpython -m venv venv

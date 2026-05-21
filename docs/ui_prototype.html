@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkAI — UI Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1E3A8A;--indigo:#6366F1;--indigo-dark:#4F46E5;
+  --bg:#EEF2FF;--card:#fff;--text:#1F2937;--muted:#6B7280;--border:#E5E7EB;
+  --success:#10B981;--danger:#EF4444;--warning:#F59E0B;
+  --hr-bg:#FFF1F2;--hr:#E11D48;
+  --it-bg:#EFF6FF;--it:#2563EB;
+  --fin-bg:#F0FDF4;--fin:#16A34A;
+  --leg-bg:#FAF5FF;--leg:#9333EA;
+  --adm-bg:#FFF7ED;--adm:#EA580C;
+  --r:16px;--rsm:10px;--sh:0 2px 12px rgba(0,0,0,.08);--shlg:0 8px 32px rgba(0,0,0,.14)
+}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:24px;gap:20px
+}
+.proto-label{color:#fff;font-size:12px;font-weight:600;opacity:.85;letter-spacing:.5px;text-transform:uppercase}
+
+/* ── Phone frame ── */
+.phone{
+  width:390px;height:844px;background:#000;
+  border-radius:50px;border:10px solid #1a1a1a;
+  box-shadow:0 0 0 1px #333,0 30px 80px rgba(0,0,0,.5);
+  position:relative;overflow:hidden;flex-shrink:0
+}
+.island{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  width:120px;height:34px;background:#000;border-radius:20px;z-index:100
+}
+.sc{width:100%;height:100%;background:var(--bg);position:relative;overflow:hidden}
+
+/* ── Status bar ── */
+.sbar{
+  height:50px;padding:14px 24px 0;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  font-size:13px;font-weight:600;position:relative;z-index:50
+}
+.sbar.l{color:#fff}.sbar.d{color:var(--text)}
+.sicons{display:flex;align-items:center;gap:6px}
+
+/* ── Screen base ── */
+.screen{display:none;flex-direction:column;width:100%;height:100%;position:absolute;top:0;left:0}
+.screen.active{display:flex}
+.sbody{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.sbody::-webkit-scrollbar{display:none}
+
+/* ── Nav header ── */
+.nhdr{background:var(--navy);padding:0 20px 16px;color:#fff;flex-shrink:0}
+.nrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ntitle{font-size:18px;font-weight:700}
+.nback{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.15);display:flex;align-items:center;
+  justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0
+}
+.avatar{
+  width:36px;height:36px;border-radius:50%;background:var(--indigo);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#fff;flex-shrink:0
+}
+
+/* ── Tab bar ── */
+.tabs{
+  background:#fff;border-top:1px solid var(--border);
+  display:flex;padding:8px 0 24px;flex-shrink:0
+}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0}
+.tab-ico{font-size:22px}
+.tab-lbl{font-size:10px;font-weight:600;color:var(--muted)}
+.tab.on .tab-lbl{color:var(--indigo)}
+
+/* ── Buttons / inputs ── */
+.btn{
+  width:100%;height:54px;border:none;border-radius:var(--rsm);
+  font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s
+}
+.btn.primary{background:var(--indigo);color:#fff}
+.btn.primary:hover{background:var(--indigo-dark)}
+.btn.primary:active{transform:scale(.98)}
+.btn.outline{background:transparent;color:var(--indigo);border:1.5px solid var(--indigo)}
+.inp{
+  width:100%;height:52px;border:1.5px solid var(--border);border-radius:var(--rsm);
+  padding:0 16px;font-size:15px;font-family:inherit;color:var(--text);
+  background:#fff;outline:none;transition:.2s
+}
+.inp:focus{border-color:var(--indigo)}
+.inp::placeholder{color:#C4C4C4}
+.sel{
+  width:100%;height:52px;border:1.5px solid var(--border);border-radius:var(--rsm);
+  padding:0 16px;font-size:15px;font-family:inherit;color:var(--text);
+  background:#fff;outline:none;appearance:none;cursor:pointer
+}
+.flbl{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block}
+.fgrp{display:flex;flex-direction:column;gap:16px}
+.lnk{text-align:center;font-size:14px;color:var(--muted)}
+.lnk a{color:var(--indigo);font-weight:600;text-decoration:none;cursor:pointer}
+
+/* ════════════════════════════════════════
+   LOGIN
+════════════════════════════════════════ */
+.login-top{
+  background:var(--navy);padding:48px 32px 64px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  border-radius:0 0 40px 40px
+}
+.app-icon{
+  width:72px;height:72px;background:rgba(255,255,255,.15);border-radius:20px;
+  display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:16px
+}
+.app-name{font-size:24px;font-weight:800;color:#fff;letter-spacing:-.5px}
+.app-tag{font-size:13px;color:rgba(255,255,255,.7);margin-top:6px}
+.lform{padding:32px 24px;display:flex;flex-direction:column;gap:16px;flex:1}
+
+/* ════════════════════════════════════════
+   HOME
+════════════════════════════════════════ */
+.hhdr{background:var(--navy);padding:0 20px 24px;color:#fff}
+.hgreet{font-size:22px;font-weight:800;margin-top:8px}
+.hsub{font-size:13px;color:rgba(255,255,255,.7);margin-top:4px}
+.hsearch{
+  background:rgba(255,255,255,.12);border-radius:var(--rsm);
+  height:42px;display:flex;align-items:center;padding:0 14px;gap:10px;
+  margin-top:16px;font-size:14px;color:rgba(255,255,255,.6)
+}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:20px 16px}
+.dcard{
+  background:#fff;border-radius:var(--r);padding:18px 16px;
+  box-shadow:var(--sh);cursor:pointer;transition:.15s;position:relative;overflow:hidden
+}
+.dcard:hover{box-shadow:var(--shlg);transform:translateY(-2px)}
+.dcard:active{transform:scale(.97)}
+.dcard.wide{grid-column:1/-1;display:flex;align-items:center;gap:16px}
+.dico{
+  width:48px;height:48px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0
+}
+.dname{font-size:15px;font-weight:700;color:var(--text);margin-top:12px}
+.dcard.wide .dname{margin-top:0}
+.ddesc{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5}
+.dbadge{
+  position:absolute;top:14px;right:14px;background:var(--bg);
+  border-radius:20px;padding:3px 8px;font-size:10px;font-weight:600;color:var(--muted)
+}
+.sec-title{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;padding:0 16px;margin-bottom:8px}
+.ritem{
+  background:#fff;margin:0 16px 8px;border-radius:var(--rsm);
+  padding:14px 16px;display:flex;align-items:center;gap:12px;
+  box-shadow:var(--sh);cursor:pointer
+}
+.rdot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.rcnt{flex:1;min-width:0}
+.rdept{font-size:13px;font-weight:600;color:var(--text)}
+.rprev{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rtime{font-size:11px;color:var(--muted);flex-shrink:0}
+
+/* ════════════════════════════════════════
+   CHAT
+════════════════════════════════════════ */
+.chdr{background:var(--navy);padding:0 16px 16px;color:#fff;flex-shrink:0}
+.dicoSm{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.abadge{
+  background:rgba(99,102,241,.25);border:1px solid rgba(99,102,241,.5);
+  border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:#A5B4FC;
+  display:inline-flex;align-items:center;gap:4px
+}
+.abadge .dot{width:6px;height:6px;border-radius:50%;background:var(--success);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.msgs{
+  flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;
+  background:var(--bg);scrollbar-width:none
+}
+.msgs::-webkit-scrollbar{display:none}
+.dsep{text-align:center;font-size:11px;font-weight:600;color:var(--muted);padding:4px 0}
+.mrow{display:flex;flex-direction:column;max-width:82%}
+.mrow.u{align-self:flex-end;align-items:flex-end}
+.mrow.a{align-self:flex-start;align-items:flex-start}
+.bubble{padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.6}
+.bubble.u{background:var(--indigo);color:#fff;border-bottom-right-radius:4px}
+.bubble.a{background:#fff;color:var(--text);border-bottom-left-radius:4px;box-shadow:var(--sh)}
+.rpill{
+  display:inline-flex;align-items:center;gap:6px;
+  background:#EEF2FF;border:1px solid #C7D2FE;border-radius:20px;
+  padding:4px 10px;font-size:11px;font-weight:600;color:var(--indigo);margin-bottom:8px
+}
+.rpill.warn{background:#FEF3C7;border-color:#FDE68A;color:#92400E}
+.mtime{font-size:10px;color:var(--muted);margin-top:4px;padding:0 4px}
+.typdots{
+  display:flex;align-items:center;gap:4px;background:#fff;
+  padding:14px 18px;border-radius:18px;border-bottom-left-radius:4px;box-shadow:var(--sh)
+}
+.tydot{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:tbounce 1.2s infinite}
+.tydot:nth-child(2){animation-delay:.2s}
+.tydot:nth-child(3){animation-delay:.4s}
+@keyframes tbounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+.cinput-bar{
+  background:#fff;border-top:1px solid var(--border);
+  padding:10px 16px 28px;display:flex;align-items:flex-end;gap:10px;flex-shrink:0
+}
+.cinp{
+  flex:1;background:var(--bg);border:1.5px solid var(--border);
+  border-radius:24px;padding:10px 16px;font-size:14px;font-family:inherit;
+  outline:none;resize:none;min-height:42px;max-height:100px;color:var(--text)
+}
+.sbtn{
+  width:42px;height:42px;border-radius:50%;background:var(--indigo);
+  border:none;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:18px;flex-shrink:0;transition:.15s
+}
+.sbtn:hover{background:var(--indigo-dark)}
+.sbtn:active{transform:scale(.93)}
+.scursor{
+  display:inline-block;width:2px;height:14px;background:var(--indigo);
+  margin-left:1px;animation:blink .7s step-end infinite;vertical-align:text-bottom
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ════════════════════════════════════════
+   ADMIN
+════════════════════════════════════════ */
+.aditem{background:#fff;margin:0 16px 10px;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.adhdr{padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.adico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.adname{flex:1;font-size:15px;font-weight:700;color:var(--text)}
+.dcbadge{background:var(--bg);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600;color:var(--muted)}
+.chev{font-size:14px;color:var(--muted);transition:.2s;display:inline-block}
+.aditem.open .chev{transform:rotate(90deg)}
+.doclist{display:none;border-top:1px solid var(--border)}
+.aditem.open .doclist{display:block}
+.docrow{padding:12px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.docrow:last-child{border-bottom:none}
+.doci{font-size:20px;flex-shrink:0}
+.docinfo{flex:1;min-width:0}
+.docname{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.docmeta{font-size:11px;color:var(--muted);margin-top:2px}
+.delbtn{
+  width:30px;height:30px;border-radius:8px;background:#FEF2F2;
+  border:none;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:14px;flex-shrink:0;color:var(--danger)
+}
+.uplrow{padding:12px 16px;background:#F9FAFB}
+.uplbtn{
+  width:100%;height:42px;background:#fff;border:1.5px dashed var(--border);
+  border-radius:var(--rsm);font-size:13px;font-weight:600;color:var(--indigo);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+  font-family:inherit;transition:.2s
+}
+.uplbtn:hover{background:#EEF2FF;border-color:var(--indigo)}
+
+/* ── Upload modal ── */
+.modal-ov{
+  display:none;position:absolute;inset:0;background:rgba(0,0,0,.5);
+  z-index:200;align-items:flex-end
+}
+.modal-ov.on{display:flex}
+.msheet{background:#fff;width:100%;border-radius:28px 28px 0 0;padding:8px 24px 40px}
+.mhandle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 20px}
+.mtitle{font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px}
+.msub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.dropzone{
+  border:2px dashed var(--border);border-radius:var(--r);
+  padding:32px 16px;text-align:center;margin:16px 0;cursor:pointer;transition:.2s
+}
+.dropzone:hover{border-color:var(--indigo);background:#EEF2FF}
+
+/* ── Nav buttons outside phone ── */
+.navbtns{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:520px}
+.nbtn{
+  padding:8px 16px;background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.3);border-radius:20px;
+  color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;
+  transition:.2s;backdrop-filter:blur(4px)
+}
+.nbtn:hover{background:rgba(255,255,255,.25)}
+.nbtn.on{background:rgba(255,255,255,.35);border-color:#fff}
+
+.pad{padding-bottom:100px}
+@keyframes popIn{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+</style>
+</head>
+<body>
+
+<div class="proto-label">WorkAI Enterprise Chatbot — Interactive UI Prototype</div>
+
+<div style="display:flex;flex-direction:column;align-items:center;gap:20px">
+<div class="phone">
+  <div class="island"></div>
+  <div class="sc">
+
+  <!-- ══════════════════════ LOGIN ══════════════════════ -->
+  <div id="s-login" class="screen active">
+    <div class="sbar l" style="background:var(--navy)">
+      <span>9:41</span><div class="sicons"><span>▲▲</span><span>🔋</span></div>
+    </div>
+    <div class="sbody" style="background:#fff">
+      <div class="login-top">
+        <div class="app-icon">🤖</div>
+        <div class="app-name">WorkAI</div>
+        <div class="app-tag">Your intelligent workplace assistant</div>
+      </div>
+      <div class="lform">
+        <div>
+          <span class="flbl">Email Address</span>
+          <input class="inp" type="email" placeholder="you@company.com" value="sarah.lee@company.com">
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between">
+            <span class="flbl">Password</span>
+            <span style="font-size:12px;color:var(--indigo);font-weight:600;cursor:pointer" onclick="go('s-forgot')">Forgot?</span>
+          </div>
+          <input class="inp" type="password" value="••••••••">
+        </div>
+        <button class="btn primary" style="margin-top:8px" onclick="go('s-home')">Sign In →</button>
+        <div class="lnk">Don't have an account? <a onclick="go('s-reg')">Create one</a></div>
+        <div style="margin-top:auto;padding-top:24px;text-align:center;font-size:11px;color:var(--muted)">
+          🔒 All data encrypted · JWT authentication
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ REGISTER ══════════════════════ -->
+  <div id="s-reg" class="screen">
+    <div class="sbar l" style="background:var(--navy)">
+      <span>9:41</span><div class="sicons"><span>🔋</span></div>
+    </div>
+    <div class="nhdr">
+      <div class="nrow">
+        <div class="nback" onclick="go('s-login')">←</div>
+        <div class="ntitle">Create Account</div>
+        <div style="width:36px"></div>
+      </div>
+    </div>
+    <div class="sbody" style="background:#fff;padding:24px">
+      <p style="font-size:14px;color:var(--muted);margin-bottom:24px">Fill in your details to get started.</p>
+      <div class="fgrp">
+        <div><span class="flbl">Full Name</span><input class="inp" value="Sarah Lee"></div>
+        <div><span class="flbl">Work Email</span><input class="inp" type="email" value="sarah.lee@company.com"></div>
+        <div><span class="flbl">Password</span><input class="inp" type="password" value="password123"></div>
+        <div><span class="flbl">Confirm Password</span><input class="inp" type="password" value="password123"></div>
+        <div>
+          <span class="flbl">Department</span>
+          <select class="sel">
+            <option>Select your department</option>
+            <option selected>Human Resources</option>
+            <option>Information Technology</option>
+            <option>Finance</option>
+            <option>Legal</option>
+            <option>Administration</option>
+          </select>
+        </div>
+        <button class="btn primary" onclick="go('s-home')">Create Account →</button>
+        <div class="lnk">Already have an account? <a onclick="go('s-login')">Sign in</a></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ FORGOT PASSWORD ══════════════════════ -->
+  <div id="s-forgot" class="screen">
+    <div class="sbar l" style="background:var(--navy)">
+      <span>9:41</span><div class="sicons"><span>🔋</span></div>
+    </div>
+    <div class="nhdr">
+      <div class="nrow">
+        <div class="nback" onclick="go('s-login')">←</div>
+        <div class="ntitle">Reset Password</div>
+        <div style="width:36px"></div>
+      </div>
+    </div>
+    <div class="sbody" style="background:#fff;padding:0">
+      <!-- Illustration strip -->
+      <div style="background:var(--bg);padding:40px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;border-bottom:1px solid var(--border)">
+        <div style="width:80px;height:80px;background:var(--navy);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:20px">🔑</div>
+        <div style="font-size:20px;font-weight:800;color:var(--text)">Forgot your password?</div>
+        <div style="font-size:14px;color:var(--muted);margin-top:8px;line-height:1.6">No worries. Enter your work email and we'll send a reset link to your inbox.</div>
+      </div>
+      <!-- Form -->
+      <div style="padding:32px 24px;display:flex;flex-direction:column;gap:20px">
+        <div>
+          <span class="flbl">Work Email Address</span>
+          <input class="inp" type="email" placeholder="you@company.com" id="forgot-email">
+        </div>
+        <button class="btn primary" onclick="sendReset()">Send Reset Link →</button>
+        <div class="lnk">Remembered it? <a onclick="go('s-login')">Back to Sign In</a></div>
+        <!-- Helper info -->
+        <div style="background:var(--bg);border-radius:var(--rsm);padding:16px;margin-top:8px">
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">What happens next?</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.7">
+            1. Check your inbox for an email from <strong>noreply@workai.company.com</strong><br>
+            2. Click the secure link (valid for 30 minutes)<br>
+            3. Choose a new password (min. 8 characters)
+          </div>
+        </div>
+        <div style="text-align:center;font-size:12px;color:var(--muted)">
+          No email? Check your spam folder or <a style="color:var(--indigo);font-weight:600;cursor:pointer" onclick="go('s-login')">contact IT support</a>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ RESET CONFIRMATION ══════════════════════ -->
+  <div id="s-reset-sent" class="screen">
+    <div class="sbar l" style="background:var(--navy)">
+      <span>9:41</span><div class="sicons"><span>🔋</span></div>
+    </div>
+    <div class="nhdr">
+      <div class="nrow">
+        <div class="nback" onclick="go('s-login')">←</div>
+        <div class="ntitle">Check Your Email</div>
+        <div style="width:36px"></div>
+      </div>
+    </div>
+    <div class="sbody" style="background:#fff">
+      <div style="padding:60px 32px 0;display:flex;flex-direction:column;align-items:center;text-align:center">
+        <!-- Animated checkmark circle -->
+        <div style="width:96px;height:96px;border-radius:50%;background:#DCFCE7;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:28px;animation:popIn .4s cubic-bezier(.175,.885,.32,1.275)">✅</div>
+        <div style="font-size:22px;font-weight:800;color:var(--text)">Email Sent!</div>
+        <div style="font-size:14px;color:var(--muted);margin-top:10px;line-height:1.7;max-width:280px">
+          We've sent a password reset link to<br>
+          <strong id="reset-email-display" style="color:var(--text)">your@company.com</strong>
+        </div>
+      </div>
+      <div style="padding:32px 24px;display:flex;flex-direction:column;gap:12px">
+        <!-- Step indicators -->
+        <div style="background:var(--bg);border-radius:var(--r);padding:20px">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:flex-start;gap:12px">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--success);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:700;flex-shrink:0">✓</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--text)">Reset email sent</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Link expires in 30 minutes</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);font-weight:700;flex-shrink:0">2</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--muted)">Click the link in your email</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Opens a secure reset page</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);font-weight:700;flex-shrink:0">3</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--muted)">Choose a new password</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Min. 8 characters</div></div>
+            </div>
+          </div>
+        </div>
+        <button class="btn primary" onclick="go('s-login')">Back to Sign In</button>
+        <button class="btn outline" style="height:48px;border-radius:var(--rsm);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer" onclick="go('s-forgot')">Resend Email</button>
+        <div style="text-align:center;font-size:12px;color:var(--muted);margin-top:4px">
+          Didn't receive it? Check spam or <a style="color:var(--indigo);font-weight:600;cursor:pointer">contact IT</a>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ HOME ══════════════════════ -->
+  <div id="s-home" class="screen">
+    <div class="sbar l" style="background:var(--navy)">
+      <span>9:41</span><div class="sicons"><span>▲▲</span><span>🔋</span></div>
+    </div>
+    <div class="hhdr">
+      <div class="nrow">
+        <div>
+          <div style="font-size:12px;color:rgba(255,255,255,.6);font-weight:500">Good morning 👋</div>
+          <div class="hgreet">Sarah Lee</div>
+        </div>
+        <div class="avatar">SL</div>
+      </div>
+      <div class="hsearch">🔍 <span>Ask anything or choose a department…</span></div>
+    </div>
+    <div class="sbody">
+      <div class="pad">
+        <div class="dgrid">
+          <div class="dcard" onclick="chat('hr')">
+            <div class="dbadge">3 docs</div>
+            <div class="dico" style="background:var(--hr-bg)">👥</div>
+            <div class="dname">Human Resources</div>
+            <div class="ddesc">Leave, payroll, benefits & conduct</div>
+          </div>
+          <div class="dcard" onclick="chat('it')">
+            <div class="dbadge">5 docs</div>
+            <div class="dico" style="background:var(--it-bg)">💻</div>
+            <div class="dname">IT Support</div>
+            <div class="ddesc">Access, VPN, software & hardware</div>
+          </div>
+          <div class="dcard" onclick="chat('finance')">
+            <div class="dbadge">2 docs</div>
+            <div class="dico" style="background:var(--fin-bg)">💰</div>
+            <div class="dname">Finance</div>
+            <div class="ddesc">Expenses, claims & approvals</div>
+          </div>
+          <div class="dcard" onclick="chat('legal')">
+            <div class="dbadge">1 doc</div>
+            <div class="dico" style="background:var(--leg-bg)">⚖️</div>
+            <div class="dname">Legal</div>
+            <div class="ddesc">Contracts, NDAs & compliance</div>
+          </div>
+          <div class="dcard wide" onclick="chat('admin')">
+            <div class="dico" style="background:var(--adm-bg)">📋</div>
+            <div>
+              <div class="dname">Administration</div>
+              <div class="ddesc">Rooms, facilities, supplies & travel</div>
+            </div>
+            <div style="margin-left:auto"><div class="dbadge" style="position:static">4 docs</div></div>
+          </div>
+        </div>
+        <div style="margin-top:8px">
+          <div class="sec-title">Recent Conversations</div>
+          <div class="ritem" onclick="chat('hr')">
+            <div class="rdot" style="background:var(--hr)"></div>
+            <div class="rcnt">
+              <div class="rdept">HR Agent</div>
+              <div class="rprev">You get 18 days of annual leave per year…</div>
+            </div>
+            <div class="rtime">2h ago</div>
+          </div>
+          <div class="ritem" onclick="chat('it')">
+            <div class="rdot" style="background:var(--it)"></div>
+            <div class="rcnt">
+              <div class="rdept">IT Agent</div>
+              <div class="rprev">Visit helpdesk.company.com to reset your VPN…</div>
+            </div>
+            <div class="rtime">Yesterday</div>
+          </div>
+          <div class="ritem" onclick="chat('finance')">
+            <div class="rdot" style="background:var(--fin)"></div>
+            <div class="rcnt">
+              <div class="rdept">Finance Agent</div>
+              <div class="rprev">Submit expense claims within 30 days with…</div>
+            </div>
+            <div class="rtime">Mon</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tabs">
+      <div class="tab on">
+        <div class="tab-ico">💬</div>
+        <div class="tab-lbl" style="color:var(--indigo)">Chats</div>
+      </div>
+      <div class="tab" onclick="go('s-admin')">
+        <div class="tab-ico">🛡️</div>
+        <div class="tab-lbl">Admin</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ CHAT ══════════════════════ -->
+  <div id="s-chat" class="screen" style="background:var(--bg)">
+    <div class="sbar l" style="background:var(--navy)">
+      <span>9:41</span><div class="sicons"><span>▲▲</span><span>🔋</span></div>
+    </div>
+    <div class="chdr">
+      <div class="nrow" style="margin-bottom:12px">
+        <div class="nback" onclick="go('s-home')">←</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="c-ico" class="dicoSm" style="background:var(--hr-bg)">👥</div>
+          <div>
+            <div id="c-name" style="font-size:15px;font-weight:700">HR Agent</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.6)">Powered by WorkAI</div>
+          </div>
+        </div>
+        <div style="width:36px"></div>
+      </div>
+      <div><span class="abadge"><span class="dot"></span><span id="c-label">HR Agent Active</span></span></div>
+    </div>
+    <div class="msgs" id="msgs">
+      <div class="dsep">Today</div>
+      <!-- static messages -->
+      <div class="mrow u">
+        <div class="bubble u">How many days of annual leave do I get?</div>
+        <div class="mtime">9:30 AM</div>
+      </div>
+      <div class="mrow a">
+        <div class="rpill">🎯 Routed to HR Agent · 99% confidence</div>
+        <div class="bubble a">Based on the HR Leave Policy, all full-time employees are entitled to <strong>18 days of annual leave</strong> per calendar year.<br><br>Part-time employees receive leave on a pro-rata basis. You can carry forward up to <strong>5 unused days</strong> to the next calendar year.</div>
+        <div class="mtime">9:30 AM · HR Agent</div>
+      </div>
+      <div class="mrow u">
+        <div class="bubble u">What about sick leave?</div>
+        <div class="mtime">9:31 AM</div>
+      </div>
+      <div class="mrow a">
+        <div class="rpill">🎯 HR Agent · follow-up detected</div>
+        <div class="bubble a">Employees receive <strong>14 days of paid sick leave</strong> per year. A medical certificate is required for absences exceeding 2 consecutive days. Sick leave cannot be carried forward or converted to cash.</div>
+        <div class="mtime">9:31 AM · HR Agent</div>
+      </div>
+      <div class="mrow u">
+        <div class="bubble u">How do I apply for leave?</div>
+        <div class="mtime">9:32 AM</div>
+      </div>
+      <!-- typing indicator -->
+      <div class="mrow a" id="typing-row">
+        <div class="rpill">🎯 HR Agent · responding…</div>
+        <div class="typdots">
+          <div class="tydot"></div><div class="tydot"></div><div class="tydot"></div>
+        </div>
+      </div>
+      <!-- streamed answer -->
+      <div class="mrow a" id="stream-row" style="display:none">
+        <div class="rpill">🎯 HR Agent · 97% confidence</div>
+        <div class="bubble a" id="stream-bubble"><span class="scursor"></span></div>
+        <div class="mtime" id="stream-time" style="display:none">9:32 AM · HR Agent</div>
+      </div>
+    </div>
+    <div class="cinput-bar">
+      <textarea class="cinp" placeholder="Type your question…" rows="1"></textarea>
+      <button class="sbtn">➤</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ CLARIFY ══════════════════════ -->
+  <div id="s-clarify" class="screen" style="background:var(--bg)">
+    <div class="sbar l" style="background:var(--navy)">
+      <span>9:41</span><div class="sicons"><span>🔋</span></div>
+    </div>
+    <div class="nhdr">
+      <div class="nrow">
+        <div class="nback" onclick="go('s-home')">←</div>
+        <div class="ntitle">WorkAI Assistant</div>
+        <div style="width:36px"></div>
+      </div>
+    </div>
+    <div class="msgs">
+      <div class="dsep">Today</div>
+      <div class="mrow u"><div class="bubble u">Hello</div><div class="mtime">9:30 AM</div></div>
+      <div class="mrow a">
+        <div class="rpill warn">⚠️ Confidence too low · 30%</div>
+        <div class="bubble a">Hi there! I'm not sure which team can best help you. Could you tell me which area your question is about?</div>
+        <div class="mtime">9:30 AM · WorkAI</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;padding:4px 0;align-self:flex-start">
+        <button onclick="chat('hr')"     style="padding:10px 14px;background:#fff;border:1.5px solid var(--hr);border-radius:20px;font-size:13px;font-weight:600;color:var(--hr);cursor:pointer;font-family:inherit">👥 HR</button>
+        <button onclick="chat('it')"     style="padding:10px 14px;background:#fff;border:1.5px solid var(--it);border-radius:20px;font-size:13px;font-weight:600;color:var(--it);cursor:pointer;font-family:inherit">💻 IT</button>
+        <button onclick="chat('finance')" style="padding:10px 14px;background:#fff;border:1.5px solid var(--fin);border-radius:20px;font-size:13px;font-weight:600;color:var(--fin);cursor:pointer;font-family:inherit">💰 Finance</button>
+        <button onclick="chat('legal')"  style="padding:10px 14px;background:#fff;border:1.5px solid var(--leg);border-radius:20px;font-size:13px;font-weight:600;color:var(--leg);cursor:pointer;font-family:inherit">⚖️ Legal</button>
+        <button onclick="chat('admin')"  style="padding:10px 14px;background:#fff;border:1.5px solid var(--adm);border-radius:20px;font-size:13px;font-weight:600;color:var(--adm);cursor:pointer;font-family:inherit">📋 Admin</button>
+      </div>
+    </div>
+    <div class="cinput-bar">
+      <textarea class="cinp" placeholder="Or describe your question…" rows="1"></textarea>
+      <button class="sbtn">➤</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ ADMIN ══════════════════════ -->
+  <div id="s-admin" class="screen">
+    <div class="sbar l" style="background:var(--navy)">
+      <span>9:41</span><div class="sicons"><span>▲▲</span><span>🔋</span></div>
+    </div>
+    <div class="nhdr">
+      <div class="nrow">
+        <div>
+          <div style="font-size:11px;color:rgba(255,255,255,.6)">ADMIN PANEL</div>
+          <div class="ntitle">Document Management</div>
+        </div>
+        <div class="avatar" style="background:var(--warning)">A</div>
+      </div>
+    </div>
+    <div class="sbody">
+      <div style="padding:16px 16px 0">
+        <div style="background:linear-gradient(135deg,#667eea,#764ba2);border-radius:var(--r);padding:18px;color:#fff">
+          <div style="font-size:11px;opacity:.8;font-weight:600;letter-spacing:.5px">KNOWLEDGE BASE</div>
+          <div style="font-size:26px;font-weight:800;margin-top:4px">15 Documents</div>
+          <div style="font-size:12px;opacity:.8;margin-top:4px">Across 5 departments · 284 chunks indexed</div>
+        </div>
+      </div>
+      <div style="padding:16px 0 0" class="pad">
+        <div class="sec-title">Departments</div>
+
+        <!-- HR -->
+        <div class="aditem open" id="a-hr">
+          <div class="adhdr" onclick="tog('a-hr')">
+            <div class="adico" style="background:var(--hr-bg)">👥</div>
+            <div class="adname">Human Resources</div>
+            <div class="dcbadge">3 docs</div>
+            <div class="chev">›</div>
+          </div>
+          <div class="doclist">
+            <div class="docrow"><div class="doci">📄</div><div class="docinfo"><div class="docname">HR_Leave_Policy_2024.pdf</div><div class="docmeta">PDF · 24 chunks · 12 May 2026</div></div><button class="delbtn">🗑</button></div>
+            <div class="docrow"><div class="doci">📝</div><div class="docinfo"><div class="docname">Employee_Benefits_Guide.docx</div><div class="docmeta">DOCX · 18 chunks · 8 May 2026</div></div><button class="delbtn">🗑</button></div>
+            <div class="docrow"><div class="doci">📄</div><div class="docinfo"><div class="docname">Onboarding_Handbook.pdf</div><div class="docmeta">PDF · 41 chunks · 1 May 2026</div></div><button class="delbtn">🗑</button></div>
+            <div class="uplrow"><button class="uplbtn" onclick="modal('hr')">＋ Upload HR Document</button></div>
+          </div>
+        </div>
+
+        <!-- IT -->
+        <div class="aditem" id="a-it">
+          <div class="adhdr" onclick="tog('a-it')">
+            <div class="adico" style="background:var(--it-bg)">💻</div>
+            <div class="adname">IT Support</div>
+            <div class="dcbadge">5 docs</div>
+            <div class="chev">›</div>
+          </div>
+          <div class="doclist">
+            <div class="docrow"><div class="doci">📄</div><div class="docinfo"><div class="docname">IT_Access_Policy.pdf</div><div class="docmeta">PDF · 31 chunks · 15 May 2026</div></div><button class="delbtn">🗑</button></div>
+            <div class="docrow"><div class="doci">🌐</div><div class="docinfo"><div class="docname">intranet.company.com/it-kb</div><div class="docmeta">URL · 12 chunks · 10 May 2026</div></div><button class="delbtn">🗑</button></div>
+            <div class="docrow"><div class="doci">📝</div><div class="docinfo"><div class="docname">Cybersecurity_Guidelines.docx</div><div class="docmeta">DOCX · 22 chunks · 5 May 2026</div></div><button class="delbtn">🗑</button></div>
+            <div class="uplrow"><button class="uplbtn" onclick="modal('it')">＋ Upload IT Document</button></div>
+          </div>
+        </div>
+
+        <!-- Finance -->
+        <div class="aditem" id="a-fin">
+          <div class="adhdr" onclick="tog('a-fin')">
+            <div class="adico" style="background:var(--fin-bg)">💰</div>
+            <div class="adname">Finance</div>
+            <div class="dcbadge">2 docs</div>
+            <div class="chev">›</div>
+          </div>
+          <div class="doclist">
+            <div class="docrow"><div class="doci">📄</div><div class="docinfo"><div class="docname">Expense_Reimbursement_Policy.pdf</div><div class="docmeta">PDF · 28 chunks · 6 May 2026</div></div><button class="delbtn">🗑</button></div>
+            <div class="docrow"><div class="doci">📄</div><div class="docinfo"><div class="docname">Travel_Claims_Guide.pdf</div><div class="docmeta">PDF · 15 chunks · 3 May 2026</div></div><button class="delbtn">🗑</button></div>
+            <div class="uplrow"><button class="uplbtn" onclick="modal('finance')">＋ Upload Finance Document</button></div>
+          </div>
+        </div>
+
+        <!-- Legal -->
+        <div class="aditem" id="a-leg">
+          <div class="adhdr" onclick="tog('a-leg')">
+            <div class="adico" style="background:var(--leg-bg)">⚖️</div>
+            <div class="adname">Legal</div>
+            <div class="dcbadge">1 doc</div>
+            <div class="chev">›</div>
+          </div>
+          <div class="doclist">
+            <div class="docrow"><div class="doci">📄</div><div class="docinfo"><div class="docname">NDA_Template_Standard.pdf</div><div class="docmeta">PDF · 9 chunks · 3 May 2026</div></div><button class="delbtn">🗑</button></div>
+            <div class="uplrow"><button class="uplbtn" onclick="modal('legal')">＋ Upload Legal Document</button></div>
+          </div>
+        </div>
+
+        <!-- Admin dept -->
+        <div class="aditem" id="a-adm">
+          <div class="adhdr" onclick="tog('a-adm')">
+            <div class="adico" style="background:var(--adm-bg)">📋</div>
+            <div class="adname">Administration</div>
+            <div class="dcbadge">4 docs</div>
+            <div class="chev">›</div>
+          </div>
+          <div class="doclist">
+            <div class="docrow"><div class="doci">📄</div><div class="docinfo"><div class="docname">Office_Facilities_Guide.pdf</div><div class="docmeta">PDF · 16 chunks · 2 May 2026</div></div><button class="delbtn">🗑</button></div>
+            <div class="docrow"><div class="doci">📄</div><div class="docinfo"><div class="docname">Meeting_Room_Booking_Policy.pdf</div><div class="docmeta">PDF · 8 chunks · 1 May 2026</div></div><button class="delbtn">🗑</button></div>
+            <div class="uplrow"><button class="uplbtn" onclick="modal('admin')">＋ Upload Admin Document</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tabs">
+      <div class="tab" onclick="go('s-home')">
+        <div class="tab-ico">💬</div><div class="tab-lbl">Chats</div>
+      </div>
+      <div class="tab on">
+        <div class="tab-ico">🛡️</div>
+        <div class="tab-lbl" style="color:var(--indigo)">Admin</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ UPLOAD MODAL ══════════════════════ -->
+  <div class="modal-ov" id="umodal" onclick="closeModal(event)">
+    <div class="msheet" onclick="event.stopPropagation()">
+      <div class="mhandle"></div>
+      <div class="mtitle">Upload Document</div>
+      <div class="msub" id="msub">Add a document to Human Resources</div>
+      <div style="margin-bottom:12px">
+        <span class="flbl">Department</span>
+        <select class="sel" id="mdept">
+          <option value="hr">👥 Human Resources</option>
+          <option value="it">💻 IT Support</option>
+          <option value="finance">💰 Finance</option>
+          <option value="legal">⚖️ Legal</option>
+          <option value="admin">📋 Administration</option>
+        </select>
+      </div>
+      <div class="dropzone">
+        <div style="font-size:36px;margin-bottom:8px">📁</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text)">Tap to choose a file</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">PDF, DOCX, TXT or MD · Max 50 MB</div>
+      </div>
+      <div style="text-align:center;margin:8px 0;font-size:13px;color:var(--muted)">— or paste a URL —</div>
+      <input class="inp" placeholder="https://intranet.company.com/policy" style="margin-bottom:16px">
+      <button class="btn primary" onclick="closeModal()">⬆ Upload &amp; Index</button>
+    </div>
+  </div>
+
+  </div><!-- sc -->
+</div><!-- phone -->
+
+<!-- ── Screen selector ── -->
+<div class="navbtns">
+  <button class="nbtn on" id="nb-login"   onclick="go('s-login')">🔐 Login</button>
+  <button class="nbtn"    id="nb-reg"     onclick="go('s-reg')">📝 Register</button>
+  <button class="nbtn"    id="nb-forgot"  onclick="go('s-forgot')">🔑 Forgot Pwd</button>
+  <button class="nbtn"    id="nb-home"    onclick="go('s-home')">🏠 Home</button>
+  <button class="nbtn"    id="nb-chat"    onclick="chat('hr')">💬 Chat · HR</button>
+  <button class="nbtn"    id="nb-clarify" onclick="go('s-clarify')">❓ Clarify</button>
+  <button class="nbtn"    id="nb-admin"   onclick="go('s-admin')">🛡️ Admin</button>
+  <button class="nbtn"    id="nb-upload"  onclick="go('s-admin');modal('hr')">⬆ Upload</button>
+</div>
+
+</div><!-- outer flex -->
+
+<script>
+// ── Dept config ──
+const D = {
+  hr:      {name:'Human Resources', ico:'👥', bg:'#FFF1F2', label:'HR Agent Active'},
+  it:      {name:'IT Support',       ico:'💻', bg:'#EFF6FF', label:'IT Agent Active'},
+  finance: {name:'Finance',          ico:'💰', bg:'#F0FDF4', label:'Finance Agent Active'},
+  legal:   {name:'Legal',            ico:'⚖️', bg:'#FAF5FF', label:'Legal Agent Active'},
+  admin:   {name:'Administration',   ico:'📋', bg:'#FFF7ED', label:'Admin Agent Active'},
+};
+
+// ── Navigation ──
+const BTN_MAP = {'s-login':'nb-login','s-reg':'nb-reg','s-forgot':'nb-forgot','s-reset-sent':'nb-forgot','s-home':'nb-home','s-chat':'nb-chat','s-clarify':'nb-clarify','s-admin':'nb-admin'};
+
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('on'));
+  const b = BTN_MAP[id]; if(b) document.getElementById(b)?.classList.add('on');
+}
+
+// ── Chat screen ──
+let _streamT = null;
+const STREAM_TEXT = "To apply for leave, submit your request via the HR portal at least 3 working days in advance. For leave exceeding 5 consecutive days, obtain manager approval at least 2 weeks ahead. Emergency situations are handled on a case-by-case basis — contact HR directly.";
+
+function chat(dept) {
+  const d = D[dept]||D.hr;
+  document.getElementById('c-ico').textContent   = d.ico;
+  document.getElementById('c-ico').style.background = d.bg;
+  document.getElementById('c-name').textContent  = d.name;
+  document.getElementById('c-label').textContent = d.label;
+
+  // reset stream
+  if(_streamT){clearTimeout(_streamT);_streamT=null;}
+  document.getElementById('typing-row').style.display='flex';
+  document.getElementById('stream-row').style.display='none';
+  document.getElementById('stream-bubble').innerHTML='<span class="scursor"></span>';
+  document.getElementById('stream-time').style.display='none';
+
+  go('s-chat');
+  document.getElementById('msgs').scrollTop=9999;
+  _streamT = setTimeout(startStream, 1600);
+}
+
+function startStream(){
+  document.getElementById('typing-row').style.display='none';
+  const row = document.getElementById('stream-row');
+  row.style.display='flex';
+  const bub = document.getElementById('stream-bubble');
+  bub.innerHTML='<span class="scursor"></span>';
+  const cur = bub.querySelector('.scursor');
+  let i=0;
+  const iv = setInterval(()=>{
+    if(i>=STREAM_TEXT.length){
+      clearInterval(iv); cur.remove();
+      document.getElementById('stream-time').style.display='block';
+      document.getElementById('msgs').scrollTop=9999;
+      return;
+    }
+    const step = Math.ceil(Math.random()*4);
+    bub.insertBefore(document.createTextNode(STREAM_TEXT.slice(i,i+step)), cur);
+    i+=step;
+    document.getElementById('msgs').scrollTop=9999;
+  }, 28);
+}
+
+// ── Admin accordion ──
+function tog(id){document.getElementById(id).classList.toggle('open');}
+
+// ── Upload modal ──
+const dnames={hr:'Human Resources',it:'IT Support',finance:'Finance',legal:'Legal',admin:'Administration'};
+function modal(dept){
+  document.getElementById('mdept').value=dept;
+  document.getElementById('msub').textContent='Add a document to '+dnames[dept];
+  document.getElementById('umodal').classList.add('on');
+}
+function closeModal(e){
+  if(!e||e.target===document.getElementById('umodal'))
+    document.getElementById('umodal').classList.remove('on');
+}
+
+// ── Password reset flow ──
+function sendReset(){
+  const email = document.getElementById('forgot-email').value.trim() || 'sarah.lee@company.com';
+  document.getElementById('reset-email-display').textContent = email;
+  go('s-reset-sent');
+}
+
+// init scroll
+document.getElementById('msgs').scrollTop=9999;
+</script>
+</body>
+</html>
